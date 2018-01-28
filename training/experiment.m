@@ -221,10 +221,17 @@ function [imdb_video, imdb] = choose_val_set(imdb_video, opts)
     VAL_SET = 2;
 
     % set opts.validation to validation and the rest to training.
+    % 返回符合条件的数据个数
     size_dataset = numel(imdb_video.id);
+    % round（）取整
+    % opts.validation=0.1
     size_validation = round(opts.validation * size_dataset);
+    %去除validation部分，剩余部分为训练部分
     size_training = size_dataset - size_validation;
+    % uint8()转换为unit8格式，8位无符号字符，即一个字节（matlab中的图像保存方法）
+    % zeros(m,n)：生成m×n的零矩阵
     imdb_video.set = uint8(zeros(1, size_dataset));
+    % 为training data 和 validation data 赋值
     imdb_video.set(1:size_training) = TRAIN_SET;
     imdb_video.set(size_training+1:end) = VAL_SET;
 
