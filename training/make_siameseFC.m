@@ -9,6 +9,7 @@ function net = make_siameseFC(opts)
 % -------------------------------------------------------------------------------------------------------
     net_opts.siamese = true;
     net_opts.batchNormalization = true;
+    %matlab中的strides和tensorflow中的strides的区别？？？
     net_opts.strides = [2, 2, 1, 2];
     net_opts = vl_argparse(net_opts, {opts.net.conf});
 
