@@ -13,6 +13,7 @@ function net = vid_create_net(varargin)
     %opts.weightInitMethod = 'xavierimproved' ;
     opts.weightInitMethod = 'gaussian';
     opts.batchNormalization = false ;
+    %初始化网络类型
     opts.networkType = 'simplenn' ;
     opts.strides = [2, 2, 1, 2] ;
     opts.cudnnWorkspaceLimit = 1024*1024*1024 ; % 1GB
@@ -25,9 +26,11 @@ function net = vid_create_net(varargin)
         opts.instanceSize = [opts.instanceSize, opts.instanceSize];
     end
 
+    %创建alexnet网络（5 conv layers，conv5 后面不接池化层
     net = modified_alexnet(struct(), opts) ;
 
     % Meta parameters
+    %双三次插值
     net.meta.normalization.interpolation = 'bicubic' ;
     net.meta.normalization.averageImage = [] ;
     net.meta.normalization.keepAspect = true ;
@@ -55,6 +58,8 @@ function net = vid_create_net(varargin)
 end
 
 % --------------------------------------------------------------------
+%add_block(net, opts, id, h, w, in, out, stride, pad, init_bias)
+%add_block(net, opts, '1', 11, 11, 3, 96, strides(1), 0) ;
 function net = add_block(net, opts, id, h, w, in, out, stride, pad, init_bias)
 % --------------------------------------------------------------------
 info = vl_simplenn_display(net) ;
@@ -65,7 +70,10 @@ else
   name = 'conv' ;
 end
 convOpts = {'CudnnWorkspaceLimit', opts.cudnnWorkspaceLimit} ;
+%格式：'type','conv'即type='conv'
 net.layers{end+1} = struct('type', 'conv', 'name', sprintf('%s%s', name, id), ...
+                            %filter size:h×w×in(channels)
+                            %output map:channels=out
                            'weights', {{init_weight(opts, h, w, in, out, 'single'), zeros(out, 1, 'single')}}, ...
                            'stride', stride, ...
                            'pad', pad, ...
@@ -82,6 +90,7 @@ net.layers{end+1} = struct('type', 'relu', 'name', sprintf('relu%s',id)) ;
 end
 
 % --------------------------------------------------------------------
+% create conv layer only，not batchNormalization
 function net = add_block_conv_only(net, opts, id, h, w, in, out, stride, pad, init_bias)
 % --------------------------------------------------------------------
 info = vl_simplenn_display(net) ;
@@ -130,24 +139,30 @@ function net = modified_alexnet(net, opts)
 
     net.layers = {} ;
 
+    %create net conv layer1
+    %net= add_block(net, opts, id,  h,  w, in, out,stride,    pad, init_bias)
     net = add_block(net, opts, '1', 11, 11, 3, 96, strides(1), 0) ;
     net = add_norm(net, opts, '1') ;
+    %create net pooling layer1
     net.layers{end+1} = struct('type', 'pool', 'name', 'pool1', ...
                                'method', 'max', ...
                                'pool', [3 3], ...
                                'stride', strides(2), ...
                                'pad', 0) ;
-
+    %create net conv layer2
     net = add_block(net, opts, '2', 5, 5, 48, 256, strides(3), 0) ;
     net = add_norm(net, opts, '2') ;
+    %create net pooling layer2
     net.layers{end+1} = struct('type', 'pool', 'name', 'pool2', ...
                                'method', 'max', ...
                                'pool', [3 3], ...
                                'stride', strides(4), ...
                                'pad', 0) ;
-
+    %create net conv layer3
     net = add_block(net, opts, '3', 3, 3, 256, 384, strides(5), 0) ;
+    %create net conv layer4
     net = add_block(net, opts, '4', 3, 3, 192, 384, strides(6), 0) ;
+    %create net conv layer5
     net = add_block_conv_only(net, opts, '5', 3, 3, 192, 256, strides(7), 0) ;
 
     % Check if the receptive field covers full image
