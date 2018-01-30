@@ -162,6 +162,7 @@ end
 
 
 % -------------------------------------------------------------------------------------------------
+%                               by gp// setup_loss(net, resp_sz, resp_stride, opts.loss);
 function [net, derOutputs, inputs_fn] = setup_loss(net, resp_sz, resp_stride, loss_opts)
 % Add layers to the network, specifies the losses to minimise, and
 % constructs a function that returns the inputs required by the loss layers.
@@ -172,6 +173,7 @@ function [net, derOutputs, inputs_fn] = setup_loss(net, resp_sz, resp_stride, lo
                  dagnn.Loss('loss', 'logistic'), ...
                  {'score', 'eltwise_label'}, 'objective');
     % adding weights to loss layer
+    %by gp//loss_opts.labelWeight:the label create type
     [pos_eltwise, instanceWeight] = create_labels(...
         resp_sz, loss_opts.labelWeight, ...
         loss_opts.rPos/resp_stride, loss_opts.rNeg/resp_stride);
