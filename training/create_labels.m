@@ -11,6 +11,7 @@ function [fixedLabel, instanceWeight] = create_labels(fixedLabelSize, labelWeigh
     switch labelWeight
         case 'uniform'
             % constant weight
+            %by gp//create_logisticloss_lbel:get from util/create_logisticloss_label.m
             fixedLabel = create_logisticloss_label(fixedLabelSize, rPos, rNeg);
             instanceWeight = 1/nnz(fixedLabel) * ones(size(fixedLabel));
         case 'balanced' % default choice
