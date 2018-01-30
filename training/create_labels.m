@@ -1,4 +1,6 @@
 % -------------------------------------------------------------------------------------------------------
+% create_labels( resp_sz, loss_opts.labelWeight, ...
+%       loss_opts.rPos/resp_stride, loss_opts.rNeg/resp_stride);
 function [fixedLabel, instanceWeight] = create_labels(fixedLabelSize, labelWeight, rPos, rNeg)
 %CREATE_LABELS
 %
