@@ -66,6 +66,7 @@ function [net, stats] = experiment(imdb_video, varargin)
     rng(opts.randomSeed); % Re-seed before calling make_net.
 
     % -------------------------------------------------------------------------------------------------
+    %by gp//make_net<-make_siamseFC<-vid_create_net
     net = make_net(opts);
     % -------------------------------------------------------------------------------------------------
 
