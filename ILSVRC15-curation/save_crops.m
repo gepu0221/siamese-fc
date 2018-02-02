@@ -11,10 +11,13 @@ function save_crops(imdb_video,v_1,v_end, root_original, root_crops)
     context_amount = 0.5;
 
     saved_crops = 0;
+    %v_1-v_end个视频
     for v=v_1:v_end
         valid_trackids = find(imdb_video.valid_trackids(:,v));
+	%共有多少帧
         for ti=1:numel(valid_trackids)
             valid_objects = imdb_video.valid_per_trackid{valid_trackids(ti),v};
+	    %共有多少个目标
             for o = 1:numel(valid_objects)
                 obj = imdb_video.objects{v}{valid_objects(o)};
                 assert(obj.valid)
